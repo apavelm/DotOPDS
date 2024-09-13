@@ -1,6 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
 using DotOPDS.Contract.Models;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace DotOPDS.BookProvider.Inpx;
 

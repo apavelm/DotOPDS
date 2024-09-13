@@ -1,5 +1,8 @@
 // See https://aka.ms/new-console-template for more information
 
+using System;
+using System.IO;
+
 Console.WriteLine("Hello, World!");
 
 if (args.Length == 0)

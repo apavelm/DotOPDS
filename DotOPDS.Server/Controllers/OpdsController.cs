@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using DotOPDS.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -12,6 +14,10 @@ using DotOPDS.Dto;
 using DotOPDS.Contract;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace DotOPDS.Controllers;
 

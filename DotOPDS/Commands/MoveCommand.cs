@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using CommandLine;
 using CommandLine.Text;
 using DotOPDS.Shared;

@@ -1,3 +1,4 @@
+using System.Net.Http;
 using Xunit;
 
 namespace DotOPDS.Tests.Fixtures;

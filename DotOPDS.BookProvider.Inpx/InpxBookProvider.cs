@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
 using DotOPDS.Contract;
 using DotOPDS.Contract.Models;
 using DotOPDS.Contract.Plugins;

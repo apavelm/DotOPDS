@@ -1,6 +1,9 @@
+using System.Collections.Generic;
+using System.IO;
 using DotOPDS.Contract.Models;
 using DotOPDS.Shared;
 using System.IO.Compression;
+using Microsoft.Extensions.Logging;
 
 namespace DotOPDS.Services;
 

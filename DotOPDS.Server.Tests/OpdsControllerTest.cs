@@ -1,7 +1,10 @@
+using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using DotOPDS.Dto;
 using DotOPDS.Shared.Options;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Xunit;
 
 namespace DotOPDS.Tests;

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DotOPDS.Manage;
 using DotOPDS.Manage.Commands;
 using DotOPDS.Shared;
