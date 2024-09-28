@@ -1,0 +1,45 @@
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+}
+        
+<form>
+    <div class="row">
+        <div class="col-sm-10 col-xs-12">
+            <div class="input-group" id="search-holder">
+                <input class="form-control" type="text" name="q" placeholder="Поиск по книгам, сериям, авторам..." autofocus onfocus="this.value = this.value;">
+                <div class="spinner input-group-addon" role="spinner"><div class="spinner-icon"></div></div>
+                <span class="input-group-btn hidden-lg hidden-md hidden-sm">
+                    <button class="btn btn-info" type="submit">Искать!</button>
+                </span>
+            </div>
+        </div>
+        <div class="col-sm-2 hidden-xs">
+            <button class="btn btn-info form-control" type="submit">Искать!</button>
+        </div>
+    </div>
+</form>
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="row" id="search-info-found">
+            <div class="search-info">Найдено <span id="search-info-total"></span> книг.</div>
+            <nav class="pagination-fix">
+            </nav>
+        </div>
+        <div class="row" id="search-info-not-found">
+            <div class="search-info" id="search-info">Ничего не найдено :(</div>
+        </div>
+        <div class="clearfix"></div>
+
+        <div id="entries"></div>
+
+        <div class="row">
+            <nav class="pagination-fix">
+            </nav>
+        </div>
+    </div>
+</div>

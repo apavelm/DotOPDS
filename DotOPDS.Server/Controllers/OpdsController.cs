@@ -1,27 +1,29 @@
 using System;
 using System.Collections.Generic;
-using DotOPDS.Services;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using System.Text;
-using DotOPDS.Shared.Options;
-using DotOPDS.Shared;
-using DotOPDS.Shared.Plugins;
-using DotOPDS.Contract.Plugins;
-using DotOPDS.Contract.Models;
-using DotOPDS.Extensions;
-using DotOPDS.Dto;
-using DotOPDS.Contract;
-using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using DotOPDS.Contract;
+using DotOPDS.Contract.Models;
+using DotOPDS.Contract.Plugins;
+using DotOPDS.Dto;
+using DotOPDS.Extensions;
+using DotOPDS.Services;
+using DotOPDS.Shared;
+using DotOPDS.Shared.Options;
+using DotOPDS.Shared.Plugins;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
-namespace DotOPDS.Controllers;
+namespace DotOPDS.Server.Controllers;
 
 [Route("opds")]
+[Authorize(Constants.AuthBasicPolicy)]
 public class OpdsController : ControllerBase
 {
     private readonly PresentationOptions _options;

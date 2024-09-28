@@ -5,34 +5,30 @@ using System.Threading;
 using System.Threading.Tasks;
 using DotOPDS.Contract.Models;
 using DotOPDS.Extensions;
-using DotOPDS.Shared;
 using DotOPDS.Services;
+using DotOPDS.Shared;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace DotOPDS.Controllers;
+namespace DotOPDS.Server.Controllers;
 
 [Route("download")]
-public class DownloadController : ControllerBase
+[Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme, Policy = Constants.AuthAllPolicies)]
+public class DownloadController(
+    ILogger<DownloadController> logger,
+    LuceneIndexStorage textSearch,
+    FileUtils fileUtils,
+    MimeHelper mimeHelper,
+    ConverterService converter)
+    : ControllerBase
 {
-    private readonly ILogger<DownloadController> _logger;
-    private readonly LuceneIndexStorage _textSearch;
-    private readonly FileUtils _fileUtils;
-    private readonly MimeHelper _mimeHelper;
-    private readonly ConverterService _converter;
-
-    public DownloadController(
-        ILogger<DownloadController> logger,
-        LuceneIndexStorage textSearch,
-        FileUtils fileUtils,
-        MimeHelper mimeHelper,
-        ConverterService converter)
+    // TODO: REMOVE ME
+    [Route("test")]
+    public IActionResult Test()
     {
-        _logger = logger;
-        _textSearch = textSearch;
-        _fileUtils = fileUtils;
-        _mimeHelper = mimeHelper;
-        _converter = converter;
+        return Ok("OK");
     }
 
     [Route("file/{id:guid}/{ext}", Name = nameof(GetFile))]
@@ -40,14 +36,14 @@ public class DownloadController : ControllerBase
     {
         var book = GetBookById(id);
 
-        var content = await _converter.GetFileInFormatAsync(book, ext, cancellationToken);
+        var content = await converter.GetFileInFormatAsync(book, ext, cancellationToken);
         if (content == null)
         {
             return NotFound();
         }
 
-        _logger.LogInformation("Book {Id} served to {ClientIp}", id, HttpContext.Connection.RemoteIpAddress?.ToString());
-        return File(content, _mimeHelper.GetContentType(ext), GetBookSafeName(book, ext));
+        logger.LogInformation("Book {Id} served to {ClientIp}", id, HttpContext.Connection.RemoteIpAddress?.ToString());
+        return File(content, mimeHelper.GetContentType(ext), GetBookSafeName(book, ext));
     }
 
     [Route("cover/{id:guid}", Name = nameof(GetCover))]
@@ -57,7 +53,7 @@ public class DownloadController : ControllerBase
 
         if (book.Cover == null || book.Cover.Data == null || book.Cover.ContentType == null)
         {
-            _logger.LogWarning("No cover found for file {Id}", id);
+            logger.LogWarning("No cover found for file {Id}", id);
             return NotFound();
         }
 
@@ -66,29 +62,29 @@ public class DownloadController : ControllerBase
 
     private Book GetBookById(Guid id)
     {
-        var books = _textSearch.SearchExact(out int total, "guid", id.ToString(), take: 1);
+        var books = textSearch.SearchExact(out int total, "guid", id.ToString(), take: 1);
         if (total != 1)
         {
-            _logger.LogDebug("File {Id} not found", id);
+            logger.LogDebug("File {Id} not found", id);
             throw new KeyNotFoundException("Key Not Found: " + id);
         }
 
-        _logger.LogDebug("File {Id} found in {Time}ms", id, _textSearch.Time);
+        logger.LogDebug("File {Id} found in {Time}ms", id, textSearch.Time);
 
         return books.First();
     }
 
     private static readonly Dictionary<char, string> _dangerChars = new()
     {
-        { '/', "" },
-        { '\\', "" },
-        { ':', "" },
-        { '*', "" },
-        { '?', "" },
-        { '"', "'" },
-        { '<', "«" },
-        { '>', "»" },
-        { '|', "" },
+        {'/', ""},
+        {'\\', ""},
+        {':', ""},
+        {'*', ""},
+        {'?', ""},
+        {'"', "'"},
+        {'<', "«"},
+        {'>', "»"},
+        {'|', ""},
     };
 
     private static string FilterDangerChars(string s)
@@ -99,6 +95,7 @@ public class DownloadController : ControllerBase
             if (_dangerChars.ContainsKey(c)) res += _dangerChars[c];
             else res += c;
         }
+
         return res;
     }
 
@@ -113,6 +110,7 @@ public class DownloadController : ControllerBase
                 result = $"{firstAuthor.GetScreenName()} - {result}";
             }
         }
+
         return $"{FilterDangerChars(result)}.{ext}";
     }
 }

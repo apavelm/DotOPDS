@@ -1,0 +1,45 @@
+@model DotOPDS.Server.ViewModels.LoginViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+
+    <title>Book Library Catalog</title>
+    <meta name="referrer" content="no-referrer">
+    <link rel="icon" type="image/vnd.microsoft.icon" href="~/favicon.ico"> <!-- icons8.com http://www.iconsdb.com/royal-blue-icons/book-stack-icon.html -->
+    <link rel="stylesheet" href="~/vendor/nprogress/nprogress.css">
+    <link rel="stylesheet" href="~/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/main.css">
+</head>
+
+<body>
+    
+<div class="vertical-center" id="wrapper">
+    <div class="container">
+        <div class="row">
+                <h3 class="title">Book Catalog</h3>
+            <form autocomplete="off" asp-route="Login">
+                <input type="hidden" asp-for="ReturnUrl"/>
+                <div class="card">
+                    <input type="text" class="form-control form-control-lg" placeholder="Username" asp-for="Username" autofocus>
+                    <input type="password" class="form-control form-control-lg form-control-last" placeholder="Password" asp-for="Password">
+                </div>
+                <p>
+                    <button type="submit" class="btn btn-dark btn-block mt-3">Login</button>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="~/vendor/jquery/jquery.min.js" type="text/javascript"></script>
+<script src="~/vendor/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+
+</body>
+</html>

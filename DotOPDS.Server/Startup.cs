@@ -3,26 +3,31 @@ using DotOPDS.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System.Text.Json.Serialization;
+using DotOPDS.DbLayer;
+using DotOPDS.Server.DevData;
+using DotOPDS.Server.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using DotOPDS.Server.Services;
+using Microsoft.Extensions.Logging;
 
 namespace DotOPDS;
 
-public class Startup
+public class Startup(IConfiguration configuration)
 {
-    public Startup(IConfiguration configuration)
-    {
-        Configuration = configuration;
-    }
-
-    public IConfiguration Configuration { get; }
-
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddLogging(o =>
+        {
+            o.AddConsole();
+            o.AddSeq("http://localhost:5341", "apikey");
+        });
+
         services
             .AddHttpContextAccessor()
             .AddLocalization()
@@ -30,12 +35,32 @@ public class Startup
             .AddJsonOptions(options =>
                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull);
 
-        SharedServices.ConfigureServices(services, Configuration);
+        services.AddDbContext<DotOPDSDbContext>(options =>
+        {
+            // TODO: Replace in-memory store by persistent one like MsSQL of pgSQL
+            options.UseInMemoryDatabase(nameof(DotOPDSDbContext));
+            // END OF TODO
+
+            // Register the entity sets needed by OpenIddict.
+            options.UseOpenIddict();
+        });
+
+        services.RegisterAuth();
+        // TODO: remove after development and moving from InMemoryDb to persistent storage like MsSQL or pgSQL
+        services.AddHostedService<TestData>();
+        // END OF TODO
+        SharedServices.ConfigureServices(services, configuration);
 
         services.AddScoped<BookParsersPool>();
         services.AddSingleton<ConverterService>();
         services.AddSingleton<FileUtils>();
         services.AddSingleton<MimeHelper>();
+        services.AddScoped<IOwnUserManagerService, OwnUserManagerService>();
+
+        services.Configure<MvcOptions>(options =>
+        {
+            options.Filters.Add(new RequireHttpsAttribute());
+        });
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,7 +73,7 @@ public class Startup
 
         app.Use(async (context, next) =>
         {
-            context.Response.Headers.Add(HeaderNames.Server, "DotOPDS");
+            context.Response.Headers.Add(HeaderNames.Server, Constants.ServerName);
             await next.Invoke();
         });
 
@@ -62,11 +87,13 @@ public class Startup
         app.UseDefaultFiles();
         app.UseStaticFiles();
         app.UseRouting();
+        app.UseAuthentication();
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapControllers();
-            endpoints.MapFallbackToFile("index.html");
+            endpoints.MapDefaultControllerRoute();
+            //endpoints.MapControllers();
+            //endpoints.MapFallbackToFile("index.html");
         });
     }
 
